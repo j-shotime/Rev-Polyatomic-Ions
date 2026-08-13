@@ -115,32 +115,46 @@ document.addEventListener('DOMContentLoaded', () => {
             const item = quizItems[randy[i]];
             variable = item.prompt;
             const correctAnswers = item.answers;
-
             const firstAnswer = await getAnswer(variable, inputElement);
 
-            let isCorrect = correctAnswers.includes(firstAnswer);
-
             if (item.twoStep) {
-                inputElement2.style.display = 'inline-block';
-                inputElement2.placeholder = 'Second accepted answer';
-                const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
-                inputElement2.style.display = 'none';
-                inputElement2.value = '';
-
-                const secondCorrect = correctAnswers.includes(secondAnswer);
-                if (isCorrect && secondCorrect) {
-                    score++;
+                if (firstAnswer === correctAnswers[0]) {
                     inputElement.style.color = 'green';
-                    inputElement2.style.color = 'green';
+                    inputElement2.style.display = 'inline-block';
+                    inputElement2.placeholder = 'Second accepted answer';
+
+                    const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
+                    const secondCorrect = secondAnswer === correctAnswers[1];
+
+                    if (secondCorrect) {
+                        score++;
+                        inputElement2.style.color = 'green';
+                    } else {
+                        incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
+                        inputElement2.style.color = 'red';
+                        inputElement2.value = correctAnswers[1] || '';
+                    }
+                } else if (firstAnswer === correctAnswers[1]) {
+                    inputElement.style.color = 'green';
+                    inputElement2.style.display = 'inline-block';
+                    inputElement2.placeholder = 'Second accepted answer';
+                    const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
+
+                    if (secondAnswer === correctAnswers[0]) {
+                        score++;
+                        inputElement2.style.color = 'green';
+                    } else {
+                        incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
+                        inputElement2.style.color = 'red';
+                        inputElement2.value = correctAnswers[0] || '';
+                    }
                 } else {
                     incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
                     inputElement.style.color = 'red';
-                    inputElement2.style.color = 'red';
                     inputElement.value = correctAnswers[0];
-                    inputElement2.value = correctAnswers[1] || '';
                 }
             } else {
-                if (isCorrect) {
+                if (correctAnswers.includes(firstAnswer)) {
                     score++;
                     inputElement.style.color = 'green';
                 } else {
