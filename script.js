@@ -14,7 +14,7 @@ function generateRandomArray(length) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const quizItems = [
-        { prompt: 'Acetate', answers: ['CH3COO-', 'C2H3O2-'] },
+        { prompt: 'Acetate', answers: ['CH3COO-', 'C2H3O2-'], twoStep: true },
         { prompt: 'Ammonium', answers: ['NH4+'] },
         { prompt: 'Carbonate', answers: ['CO3^2-'] },
         { prompt: 'Chlorate', answers: ['ClO3-'] },
@@ -73,58 +73,80 @@ document.addEventListener('DOMContentLoaded', () => {
     let incorrect = '';
     let variable = '';
 
+    const inputElement = document.getElementById('inputText');
+    const inputElement2 = document.getElementById('inputText2');
+    const button = document.getElementById('inputButton');
+
     function waitForClick() {
         return new Promise(resolve => {
-            const button = document.getElementById('inputButton');
             const handler = () => {
                 button.removeEventListener('click', handler);
                 document.removeEventListener('keyup', keyHandler);
                 resolve();
             };
+
             const keyHandler = (event) => {
                 if (event.key === 'Enter') {
                     handler();
                 }
             };
+
             button.addEventListener('click', handler);
             document.addEventListener('keyup', keyHandler);
         });
+    }
+
+    async function getAnswer(promptText, targetInput) {
+        document.getElementById('question').innerHTML = promptText + ' :';
+        targetInput.style.display = 'inline-block';
+        targetInput.readOnly = false;
+        targetInput.value = '';
+        targetInput.focus();
+
+        await waitForClick();
+
+        const answer = targetInput.value.trim();
+        targetInput.readOnly = true;
+        return answer;
     }
 
     async function runQuiz(randy) {
         for (let i = 0; i < randy.length; i++) {
             const item = quizItems[randy[i]];
             variable = item.prompt;
-            const variableTextElement = document.getElementById('question');
-            variableTextElement.innerHTML = variable + ' :';
-
-            const inputElement = document.getElementById('inputText');
-            inputElement.placeholder = 'Enter your answer';
-            inputElement.readOnly = false;
-
-            await waitForClick();
-
-            const inputValue = inputElement.value.trim();
             const correctAnswers = item.answers;
 
-            inputElement.readOnly = true;
+            const firstAnswer = await getAnswer(variable, inputElement);
 
-            if (correctAnswers.includes(inputValue)) {
-                score++;
-                inputElement.style.color = 'green';
+            let isCorrect = correctAnswers.includes(firstAnswer);
+
+            if (item.twoStep) {
+                inputElement2.style.display = 'inline-block';
+                inputElement2.placeholder = 'Second accepted answer';
+                const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
+                inputElement2.style.display = 'none';
+                inputElement2.value = '';
+
+                const secondCorrect = correctAnswers.includes(secondAnswer);
+                if (isCorrect && secondCorrect) {
+                    score++;
+                    inputElement.style.color = 'green';
+                    inputElement2.style.color = 'green';
+                } else {
+                    incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
+                    inputElement.style.color = 'red';
+                    inputElement2.style.color = 'red';
+                    inputElement.value = correctAnswers[0];
+                    inputElement2.value = correctAnswers[1] || '';
+                }
             } else {
-                incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
-                inputElement.style.color = 'red';
-                inputElement.value = correctAnswers[0];
-            }
-
-            if (item.prompt === 'Acetate' && correctAnswers.length > 1 && correctAnswers[1]) {
-                const secondAnswer = window.prompt('Acetate has a second correct answer. Enter the other formula:');
-                if (secondAnswer !== null) {
-                    const normalizedSecond = secondAnswer.trim();
-                    if (correctAnswers.includes(normalizedSecond)) {
-                        incorrect += '';
-                    }
+                if (isCorrect) {
+                    score++;
+                    inputElement.style.color = 'green';
+                } else {
+                    incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
+                    inputElement.style.color = 'red';
+                    inputElement.value = correctAnswers[0];
                 }
             }
 
@@ -133,24 +155,27 @@ document.addEventListener('DOMContentLoaded', () => {
             inputElement.style.color = 'white';
             inputElement.readOnly = false;
             inputElement.value = '';
+            inputElement2.style.color = 'white';
+            inputElement2.readOnly = false;
+            inputElement2.value = '';
+            inputElement2.style.display = 'none';
 
             console.log('Button clicked for:', variable);
-            console.log('Inputed', inputValue);
+            console.log('Inputed', firstAnswer);
         }
 
         const scoreElement = document.getElementById('description');
-        const inputElement = document.getElementById('inputText');
-        const variableTextElement = document.getElementById('question');
+        const questionElement = document.getElementById('question');
 
         scoreElement.innerHTML = 'You got ' + score + ' out of ' + randy.length + ' correct. \n';
-        variableTextElement.innerHTML = incorrect;
+        questionElement.innerHTML = incorrect;
 
-        const originalDisplay = inputElement.style.display;
         inputElement.style.display = 'none';
+        inputElement2.style.display = 'none';
 
         await waitForClick();
 
-        inputElement.style.display = originalDisplay;
+        inputElement.style.display = 'inline-block';
         runQuiz(generateRandomArray(quizItems.length));
     }
 
