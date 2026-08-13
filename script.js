@@ -13,7 +13,7 @@ function generateRandomArray(length) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const quizItems = [
+    const primaryQuestions = [
         { prompt: 'Acetate', answers: ['CH3COO-', 'C2H3O2-'], twoStep: true },
         { prompt: 'Ammonium', answers: ['NH4+'] },
         { prompt: 'Carbonate', answers: ['CO3^2-'] },
@@ -69,13 +69,68 @@ document.addEventListener('DOMContentLoaded', () => {
         { prompt: 'Hypochlorous acid', answers: ['HClO'] },
     ];
 
+    const reverseQuestions = [
+        { prompt: 'CH3COO-', answers: ['acetate'] },
+        { prompt: 'C2H3O2-', answers: ['acetate'] },
+        { prompt: 'NH4+', answers: ['ammonium'] },
+        { prompt: 'CO3^2-', answers: ['carbonate'] },
+        { prompt: 'ClO3-', answers: ['chlorate'] },
+        { prompt: 'ClO2-', answers: ['chlorite'] },
+        { prompt: 'CrO4^2-', answers: ['chromate'] },
+        { prompt: 'CN-', answers: ['cyanide'] },
+        { prompt: 'Cr2O7^2-', answers: ['dichromate'] },
+        { prompt: 'H2PO4-', answers: ['dihydrogen phosphate'] },
+        { prompt: 'HCO3-', answers: ['hydrogen carbonate', 'bicarbonate'] },
+        { prompt: 'HPO4^2-', answers: ['hydrogen phosphate'] },
+        { prompt: 'HSO4-', answers: ['hydrogen sulfate', 'bisulfate'] },
+        { prompt: 'HSO3-', answers: ['hydrogen sulfite', 'bisulfite'] },
+        { prompt: 'OH-', answers: ['hydroxide'] },
+        { prompt: 'ClO-', answers: ['hypochlorite'] },
+        { prompt: 'NO3-', answers: ['nitrate'] },
+        { prompt: 'NO2-', answers: ['nitrite'] },
+        { prompt: 'C2O4^2-', answers: ['oxalate'] },
+        { prompt: 'MnO4-', answers: ['permanganate'] },
+        { prompt: 'ClO4-', answers: ['perchlorate'] },
+        { prompt: 'O2^2-', answers: ['peroxide'] },
+        { prompt: 'PO4^3-', answers: ['phosphate'] },
+        { prompt: 'SO4^2-', answers: ['sulfate'] },
+        { prompt: 'SO3^2-', answers: ['sulfite'] },
+        { prompt: 'SCN-', answers: ['thiocyanate'] },
+
+        { prompt: 'HCl', answers: ['hydrochloric acid'] },
+        { prompt: 'HF', answers: ['hydrofluoric acid'] },
+        { prompt: 'HBr', answers: ['hydrobromic acid'] },
+        { prompt: 'HI', answers: ['hydroiodic acid'] },
+        { prompt: 'HCN', answers: ['hydrocyanic acid'] },
+        { prompt: 'H2S', answers: ['hydrosulfuric acid'] },
+        { prompt: 'H2CO3', answers: ['carbonic acid'] },
+        { prompt: 'HNO3', answers: ['nitric acid'] },
+        { prompt: 'H2SO4', answers: ['sulfuric acid'] },
+        { prompt: 'HClO3', answers: ['chloric acid'] },
+        { prompt: 'H3PO4', answers: ['phosphoric acid'] },
+        { prompt: 'HIO3', answers: ['iodic acid'] },
+        { prompt: 'HClO4', answers: ['perchloric acid'] },
+        { prompt: 'HNO4', answers: ['pernitric acid'] },
+        { prompt: 'HIO4', answers: ['periodic acid'] },
+        { prompt: 'H2CO2', answers: ['carbonous acid'] },
+        { prompt: 'HNO2', answers: ['nitrous acid'] },
+        { prompt: 'H2SO3', answers: ['sulfurous acid'] },
+        { prompt: 'HClO2', answers: ['chlorous acid'] },
+        { prompt: 'H3PO3', answers: ['phosphorous acid'] },
+        { prompt: 'H2CO', answers: ['hypocarbonous acid'] },
+        { prompt: 'HNO', answers: ['hyponitrous acid'] },
+        { prompt: 'H2SO2', answers: ['hyposulfurous acid'] },
+        { prompt: 'HClO', answers: ['hypochlorous acid'] },
+    ];
+
     let score = 0;
     let incorrect = '';
-    let variable = '';
 
     const inputElement = document.getElementById('inputText');
     const inputElement2 = document.getElementById('inputText2');
     const button = document.getElementById('inputButton');
+    const questionElement = document.getElementById('question');
+    const descriptionElement = document.getElementById('description');
 
     function waitForClick() {
         return new Promise(resolve => {
@@ -96,81 +151,85 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    async function getAnswer(promptText, targetInput) {
-        document.getElementById('question').innerHTML = promptText + ' :';
-        targetInput.style.display = 'inline-block';
-        targetInput.readOnly = false;
-        targetInput.value = '';
-        targetInput.focus();
+    async function askQuestion(item) {
+        questionElement.innerHTML = item.prompt + ' :';
+        inputElement.style.display = 'inline-block';
+        inputElement2.style.display = 'none';
+        inputElement.readOnly = false;
+        inputElement2.readOnly = false;
+        inputElement.value = '';
+        inputElement2.value = '';
+        inputElement.focus();
 
         await waitForClick();
 
-        const answer = targetInput.value.trim();
-        targetInput.readOnly = true;
-        return answer;
+        const firstAnswer = inputElement.value.trim().toLowerCase();
+        const acceptedAnswers = item.answers.map(answer => answer.toLowerCase());
+
+        if (item.twoStep) {
+            const firstCorrect = acceptedAnswers.includes(firstAnswer);
+            if (!firstCorrect) {
+                return false;
+            }
+
+            inputElement.style.color = 'green';
+            inputElement2.style.display = 'inline-block';
+            inputElement2.placeholder = 'Second accepted answer';
+            inputElement2.focus();
+
+            await waitForClick();
+
+            const secondAnswer = inputElement2.value.trim().toLowerCase();
+            const remainingAnswer = acceptedAnswers.find(answer => answer !== firstAnswer);
+
+            if (secondAnswer === remainingAnswer) {
+                inputElement2.style.color = 'green';
+                return true;
+            }
+
+            inputElement2.style.color = 'red';
+            inputElement2.value = item.answers.find(answer => answer.toLowerCase() === remainingAnswer) || remainingAnswer;
+            return false;
+        }
+
+        if (acceptedAnswers.includes(firstAnswer)) {
+            inputElement.style.color = 'green';
+            return true;
+        }
+
+        inputElement.style.color = 'red';
+        inputElement.value = item.answers[0];
+        return false;
     }
 
-    async function runQuiz(randy) {
-        for (let i = 0; i < randy.length; i++) {
-            const item = quizItems[randy[i]];
-            variable = item.prompt;
-            const correctAnswers = item.answers;
-            const firstAnswer = await getAnswer(variable, inputElement);
+    async function runQuiz() {
+        const combinedQuestions = [...primaryQuestions, ...reverseQuestions];
+        const order = generateRandomArray(combinedQuestions.length);
 
-            if (item.twoStep) {
-                const firstIsAnswer1 = firstAnswer === correctAnswers[0];
-                const firstIsAnswer2 = firstAnswer === correctAnswers[1];
+        for (let i = 0; i < order.length; i++) {
+            const item = combinedQuestions[order[i]];
+            const correct = await askQuestion(item);
 
-                if (firstIsAnswer1 || firstIsAnswer2) {
-                    inputElement.style.color = 'green';
-                    inputElement2.style.display = 'inline-block';
-                    inputElement2.placeholder = 'Second accepted answer';
-
-                    const remainingAnswer = firstIsAnswer1 ? correctAnswers[1] : correctAnswers[0];
-                    const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
-
-                    if (secondAnswer === remainingAnswer) {
-                        score++;
-                        inputElement2.style.color = 'green';
-                    } else {
-                        incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
-                        inputElement2.style.color = 'red';
-                        inputElement2.value = remainingAnswer;
-                    }
-                } else {
-                    incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
-                    inputElement.style.color = 'red';
-                    inputElement.value = correctAnswers[0];
-                }
+            if (correct) {
+                score++;
             } else {
-                if (correctAnswers.includes(firstAnswer)) {
-                    score++;
-                    inputElement.style.color = 'green';
-                } else {
-                    incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
-                    inputElement.style.color = 'red';
-                    inputElement.value = correctAnswers[0];
-                }
+                incorrect += (item.prompt + ' is ' + item.answers.join(' or ') + '<br>');
             }
 
             await waitForClick();
 
             inputElement.style.color = 'white';
-            inputElement.readOnly = false;
-            inputElement.value = '';
             inputElement2.style.color = 'white';
+            inputElement.readOnly = false;
             inputElement2.readOnly = false;
+            inputElement.value = '';
             inputElement2.value = '';
             inputElement2.style.display = 'none';
 
-            console.log('Button clicked for:', variable);
-            console.log('Inputed', firstAnswer);
+            console.log('Button clicked for:', item.prompt);
         }
 
-        const scoreElement = document.getElementById('description');
-        const questionElement = document.getElementById('question');
-
-        scoreElement.innerHTML = 'You got ' + score + ' out of ' + randy.length + ' correct. \n';
+        descriptionElement.innerHTML = 'You got ' + score + ' out of ' + combinedQuestions.length + ' correct. \n';
         questionElement.innerHTML = incorrect;
 
         inputElement.style.display = 'none';
@@ -179,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
         await waitForClick();
 
         inputElement.style.display = 'inline-block';
-        runQuiz(generateRandomArray(quizItems.length));
+        runQuiz();
     }
 
-    runQuiz(generateRandomArray(quizItems.length));
+    runQuiz();
 });
