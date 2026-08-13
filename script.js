@@ -14,65 +14,64 @@ function generateRandomArray(length) {
 
 document.addEventListener('DOMContentLoaded', () => {
     const questions = [
-        // Polyatomic ions: formula -> name
-        { prompt: 'CH3COO-', answers: ['acetate'], twoStep: true, extraAnswer: 'C2H3O2-' },
-        { prompt: 'C2H3O2-', answers: ['acetate'] },
+        // Formula -> name
+        { prompt: 'CH3COO-', answers: ['acetate'], twoStep: true, alternate: 'C2H3O2-' },
         { prompt: 'NH4+', answers: ['ammonium'] },
+        { prompt: 'CO3^2-', answers: ['carbonate'] },
+        { prompt: 'ClO3-', answers: ['chlorate'] },
+        { prompt: 'ClO2-', answers: ['chlorite'] },
+        { prompt: 'CrO4^2-', answers: ['chromate'] },
         { prompt: 'CN-', answers: ['cyanide'] },
+        { prompt: 'Cr2O7^2-', answers: ['dichromate'] },
+        { prompt: 'H2PO4-', answers: ['dihydrogen phosphate'] },
+        { prompt: 'HCO3-', answers: ['hydrogen carbonate', 'bicarbonate'], twoStep: true, alternate: 'bicarbonate' },
+        { prompt: 'HPO4^2-', answers: ['hydrogen phosphate'] },
+        { prompt: 'HSO4-', answers: ['hydrogen sulfate', 'bisulfate'], twoStep: true, alternate: 'bisulfate' },
+        { prompt: 'HSO3-', answers: ['hydrogen sulfite', 'bisulfite'], twoStep: true, alternate: 'bisulfite' },
         { prompt: 'OH-', answers: ['hydroxide'] },
         { prompt: 'ClO-', answers: ['hypochlorite'] },
-        { prompt: 'ClO2-', answers: ['chlorite'] },
-        { prompt: 'ClO3-', answers: ['chlorate'] },
-        { prompt: 'ClO4-', answers: ['perchlorate'] },
-        { prompt: 'CO3^2-', answers: ['carbonate'] },
-        { prompt: 'HCO3-', answers: ['hydrogen carbonate', 'bicarbonate'] },
-        { prompt: 'Cr2O7^2-', answers: ['dichromate'] },
-        { prompt: 'CrO4^2-', answers: ['chromate'] },
-        { prompt: 'MnO4-', answers: ['permanganate'] },
-        { prompt: 'NO2-', answers: ['nitrite'] },
         { prompt: 'NO3-', answers: ['nitrate'] },
-        { prompt: 'PO4^3-', answers: ['phosphate'] },
-        { prompt: 'HPO4^2-', answers: ['hydrogen phosphate'] },
-        { prompt: 'H2PO4-', answers: ['dihydrogen phosphate'] },
-        { prompt: 'SO3^2-', answers: ['sulfite'] },
-        { prompt: 'SO4^2-', answers: ['sulfate'] },
+        { prompt: 'NO2-', answers: ['nitrite'] },
         { prompt: 'C2O4^2-', answers: ['oxalate'] },
-        { prompt: 'SCN-', answers: ['thiocyanate'] },
-        { prompt: 'HSO4-', answers: ['hydrogen sulfate', 'bisulfate'] },
-        { prompt: 'HSO3-', answers: ['hydrogen sulfite', 'bisulfite'] },
+        { prompt: 'MnO4-', answers: ['permanganate'] },
+        { prompt: 'ClO4-', answers: ['perchlorate'] },
         { prompt: 'O2^2-', answers: ['peroxide'] },
+        { prompt: 'PO4^3-', answers: ['phosphate'] },
+        { prompt: 'SO4^2-', answers: ['sulfate'] },
+        { prompt: 'SO3^2-', answers: ['sulfite'] },
+        { prompt: 'SCN-', answers: ['thiocyanate'] },
 
-        // Polyatomic ions: name -> formula
-        { prompt: 'acetate', answers: ['CH3COO-', 'C2H3O2-'], twoStep: true, extraAnswer: 'C2H3O2-' },
+        // Name -> formula
+        { prompt: 'acetate', answers: ['CH3COO-', 'C2H3O2-'], twoStep: true, alternate: 'C2H3O2-' },
         { prompt: 'ammonium', answers: ['NH4+'] },
-        { prompt: 'cyanide', answers: ['CN-'] },
-        { prompt: 'hydroxide', answers: ['OH-'] },
-        { prompt: 'hypochlorite', answers: ['ClO-'] },
-        { prompt: 'chlorite', answers: ['ClO2-'] },
-        { prompt: 'chlorate', answers: ['ClO3-'] },
-        { prompt: 'perchlorate', answers: ['ClO4-'] },
         { prompt: 'carbonate', answers: ['CO3^2-'] },
+        { prompt: 'chlorate', answers: ['ClO3-'] },
+        { prompt: 'chlorite', answers: ['ClO2-'] },
+        { prompt: 'chromate', answers: ['CrO4^2-'] },
+        { prompt: 'cyanide', answers: ['CN-'] },
+        { prompt: 'dichromate', answers: ['Cr2O7^2-'] },
+        { prompt: 'dihydrogen phosphate', answers: ['H2PO4-'] },
         { prompt: 'hydrogen carbonate', answers: ['HCO3-'] },
         { prompt: 'bicarbonate', answers: ['HCO3-'] },
-        { prompt: 'dichromate', answers: ['Cr2O7^2-'] },
-        { prompt: 'chromate', answers: ['CrO4^2-'] },
-        { prompt: 'permanganate', answers: ['MnO4-'] },
-        { prompt: 'nitrite', answers: ['NO2-'] },
-        { prompt: 'nitrate', answers: ['NO3-'] },
-        { prompt: 'phosphate', answers: ['PO4^3-'] },
         { prompt: 'hydrogen phosphate', answers: ['HPO4^2-'] },
-        { prompt: 'dihydrogen phosphate', answers: ['H2PO4-'] },
-        { prompt: 'sulfite', answers: ['SO3^2-'] },
-        { prompt: 'sulfate', answers: ['SO4^2-'] },
-        { prompt: 'oxalate', answers: ['C2O4^2-'] },
-        { prompt: 'thiocyanate', answers: ['SCN-'] },
         { prompt: 'hydrogen sulfate', answers: ['HSO4-'] },
         { prompt: 'bisulfate', answers: ['HSO4-'] },
         { prompt: 'hydrogen sulfite', answers: ['HSO3-'] },
         { prompt: 'bisulfite', answers: ['HSO3-'] },
+        { prompt: 'hydroxide', answers: ['OH-'] },
+        { prompt: 'hypochlorite', answers: ['ClO-'] },
+        { prompt: 'nitrate', answers: ['NO3-'] },
+        { prompt: 'nitrite', answers: ['NO2-'] },
+        { prompt: 'oxalate', answers: ['C2O4^2-'] },
+        { prompt: 'permanganate', answers: ['MnO4-'] },
+        { prompt: 'perchlorate', answers: ['ClO4-'] },
         { prompt: 'peroxide', answers: ['O2^2-'] },
+        { prompt: 'phosphate', answers: ['PO4^3-'] },
+        { prompt: 'sulfate', answers: ['SO4^2-'] },
+        { prompt: 'sulfite', answers: ['SO3^2-'] },
+        { prompt: 'thiocyanate', answers: ['SCN-'] },
 
-        // Acids: name -> formula
+        // Acid name -> formula
         { prompt: 'hydrochloric acid', answers: ['HCl'] },
         { prompt: 'hydrofluoric acid', answers: ['HF'] },
         { prompt: 'hydrobromic acid', answers: ['HBr'] },
@@ -98,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
         { prompt: 'hyposulfurous acid', answers: ['H2SO2'] },
         { prompt: 'hypochlorous acid', answers: ['HClO'] },
 
-        // Acids: formula -> name
+        // Acid formula -> name
         { prompt: 'HCl', answers: ['hydrochloric acid'] },
         { prompt: 'HF', answers: ['hydrofluoric acid'] },
         { prompt: 'HBr', answers: ['hydrobromic acid'] },
@@ -191,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             inputElement2.style.color = 'red';
-            inputElement2.value = item.answers.find(answer => answer.toLowerCase() === remainingAnswer) || remainingAnswer || '';
+            inputElement2.value = item.alternate || remainingAnswer || '';
             return false;
         }
 
