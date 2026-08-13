@@ -26,9 +26,10 @@ main {
 }
 
 input {
-    padding: 10px;
+    padding: 14px 18px;
     margin: 8px;
-    font-size: 1rem;
+    font-size: 2rem;
+    width: 320px;
     border-radius: 6px;
     border: 1px solid #444;
     background: #222;
