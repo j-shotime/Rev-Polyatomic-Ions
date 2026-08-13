@@ -118,35 +118,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const firstAnswer = await getAnswer(variable, inputElement);
 
             if (item.twoStep) {
-                if (firstAnswer === correctAnswers[0]) {
+                const firstIsAnswer1 = firstAnswer === correctAnswers[0];
+                const firstIsAnswer2 = firstAnswer === correctAnswers[1];
+
+                if (firstIsAnswer1 || firstIsAnswer2) {
                     inputElement.style.color = 'green';
                     inputElement2.style.display = 'inline-block';
                     inputElement2.placeholder = 'Second accepted answer';
 
+                    const remainingAnswer = firstIsAnswer1 ? correctAnswers[1] : correctAnswers[0];
                     const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
-                    const secondCorrect = secondAnswer === correctAnswers[1];
 
-                    if (secondCorrect) {
+                    if (secondAnswer === remainingAnswer) {
                         score++;
                         inputElement2.style.color = 'green';
                     } else {
                         incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
                         inputElement2.style.color = 'red';
-                        inputElement2.value = correctAnswers[1] || '';
-                    }
-                } else if (firstAnswer === correctAnswers[1]) {
-                    inputElement.style.color = 'green';
-                    inputElement2.style.display = 'inline-block';
-                    inputElement2.placeholder = 'Second accepted answer';
-                    const secondAnswer = await getAnswer(variable + ' (second answer)', inputElement2);
-
-                    if (secondAnswer === correctAnswers[0]) {
-                        score++;
-                        inputElement2.style.color = 'green';
-                    } else {
-                        incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
-                        inputElement2.style.color = 'red';
-                        inputElement2.value = correctAnswers[0] || '';
+                        inputElement2.value = remainingAnswer;
                     }
                 } else {
                     incorrect += (variable + ' is ' + correctAnswers.join(' or ') + '<br>');
