@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputElement2.style.display = 'none';
         }
 
-        descriptionElement.innerHTML = 'You got ' + score + ' out of ' + questions.length + ' correct. \\n';
+        descriptionElement.innerHTML = 'You got ' + score + ' out of ' + questions.length + ' correct.';
         questionElement.innerHTML = incorrect;
 
         inputElement.style.display = 'none';
