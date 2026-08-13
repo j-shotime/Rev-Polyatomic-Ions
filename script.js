@@ -132,6 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const button = document.getElementById('inputButton');
     const questionElement = document.getElementById('question');
     const descriptionElement = document.getElementById('description');
+    const isFormulaAnswer = (answer) => /[A-Z]/.test(answer);
 
     function waitForClick() {
         return new Promise(resolve => {
@@ -164,8 +165,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         await waitForClick();
 
-        const firstAnswer = inputElement.value.trim().toLowerCase();
-        const acceptedAnswers = item.answers.map(answer => answer.toLowerCase());
+        const caseSensitive = item.answers.some(isFormulaAnswer);
+        const normalize = (value) => caseSensitive ? value.trim() : value.trim().toLowerCase();
+        const firstAnswer = normalize(inputElement.value);
+        const acceptedAnswers = item.answers.map(normalize);
 
         if (item.twoStep) {
             if (!acceptedAnswers.includes(firstAnswer)) {
@@ -181,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             await waitForClick();
 
-            const secondAnswer = inputElement2.value.trim().toLowerCase();
+            const secondAnswer = normalize(inputElement2.value);
             const remainingAnswer = acceptedAnswers.find(answer => answer !== firstAnswer);
 
             if (remainingAnswer && secondAnswer === remainingAnswer) {
